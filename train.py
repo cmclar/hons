@@ -13,7 +13,7 @@ from keras.layers import Embedding
 from Scripts.process import *
 
 stocks = ['AAPL5Y.csv', 'GOOGL5Y.csv', 'IBM5Y.csv', 'MSFT5Y.csv', 'SAP5Y.csv']
-model_number = 0
+model_number = 2
 
 while model_number < 3:
     i = 0
@@ -100,16 +100,32 @@ while model_number < 3:
 
         elif model_number == 2:
             model = Sequential()
-            model.add(Embedding(256, output_dim=256))
-            model.add(LSTM(128))
-            model.add(Dropout(0.5))
-            model.add(Dense(1, activation='sigmoid'))
-            model.compile(optimizer='adam',
-                          loss='mse')
+            model.add(LSTM(32, return_sequences=True,
+                           input_shape=(TRAIN_SIZE,EMB_SIZE)))  # returns a sequence of vectors of dimension 32
+            model.add(LSTM(32, return_sequences=True,
+                           input_shape=(TRAIN_SIZE, EMB_SIZE)))  # returns a sequence of vectors of dimension 32
+            model.add(LSTM(32))  # return a single vector of dimension 32
+            model.add(Dense(1))
+            model.add(Activation('linear'))
+
+            model.compile(optimizer='adam', loss='mse')
+
+            X_train = np.expand_dims(X_train, axis=2)
+            Y_train = np.expand_dims(Y_train, axis=2)
+            X_test = np.expand_dims(X_test, axis=2)
+            Y_test = np.expand_dims(Y_test, axis=2)
+
+            # model = Sequential()
+            # model.add(Embedding(1, output_dim=256))
+            # model.add(LSTM(128))
+            # model.add(Dropout(0.5))
+            # model.add(Dense(1, activation='sigmoid'))
+            # model.compile(optimizer='adam',
+            #               loss='mse')
 
             model.fit(X_train,
                       Y_train,
-                      nb_epoch=5,
+                      nb_epoch=20,
                       batch_size=128,
                       verbose=1,
                       validation_split=0.1)
