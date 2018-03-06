@@ -10,10 +10,10 @@ from keras.layers.recurrent import LSTM, GRU
 from keras.layers import Convolution1D, MaxPooling1D
 from keras.callbacks import Callback
 from keras.layers import Embedding
-from Scripts.process import *
+from process import *
 
 stocks = ['AAPL5Y.csv', 'GOOGL5Y.csv', 'IBM5Y.csv', 'MSFT5Y.csv', 'SAP5Y.csv']
-model_number = 2
+model_number = 0
 
 while model_number < 3:
     i = 0
@@ -61,6 +61,7 @@ while model_number < 3:
                       validation_split=0.1)
             score = model.evaluate(X_test, Y_test, batch_size=128)
             print(score)
+            model.save('feedModel.h5')
 
         elif model_number == 1:
             model = Sequential()
@@ -97,6 +98,7 @@ while model_number < 3:
                       validation_split=0.1)
             score = model.evaluate(X_test, Y_test, batch_size=128)
             print(score)
+            model.save('convModel.h5')
 
         elif model_number == 2:
             model = Sequential()
@@ -115,14 +117,6 @@ while model_number < 3:
             X_test = np.expand_dims(X_test, axis=2)
             Y_test = np.expand_dims(Y_test, axis=2)
 
-            # model = Sequential()
-            # model.add(Embedding(1, output_dim=256))
-            # model.add(LSTM(128))
-            # model.add(Dropout(0.5))
-            # model.add(Dense(1, activation='sigmoid'))
-            # model.compile(optimizer='adam',
-            #               loss='mse')
-
             model.fit(X_train,
                       Y_train,
                       nb_epoch=20,
@@ -130,35 +124,45 @@ while model_number < 3:
                       verbose=1,
                       validation_split=0.1)
             score = model.evaluate(X_test, Y_test, batch_size=128)
+            print("Score:")
             print(score)
+            model.save('lstmModel.h5')
 
-        params = []
-        for xt in X_testp:
-            xt = np.array(xt)
-            mean_ = xt.mean()
-            scale_ = xt.std()
-            params.append([mean_, scale_])
+        #params = []
+        #for xt in X_testp:
+        #    xt = np.array(xt)
+        #    mean_ = xt.mean()
+        #    scale_ = xt.std()
+        #    params.append([mean_, scale_])
 
-        predicted = model.predict(X_test)
-        new_predicted = []
+        #steps_ahead = 7
+        #curr_steps = 0
+        #new_predicted = X_test
 
-        for pred, par in zip(predicted, params):
-            a = pred * par[1]
-            a += par[0]
-            new_predicted.append(a)
+        #while curr_steps < steps_ahead:
+        #    predicted = model.predict(new_predicted)
+        #    new_predicted = np.expand_dims(predicted, axis=2)
 
-        mse = mean_squared_error(predicted, new_predicted)
-        print(mse)
+        #predicted = model.predict(X_test, steps=2)
+        #new_predicted = np.expand_dims(predicted, axis=2)
 
-        try:
-            fig = plt.figure()
-            plt.plot(Y_test[:150], color='black')  # BLUE - trained RESULT
-            plt.plot(predicted[:150], color='blue')  # RED - trained PREDICTION
-            plt.plot(Y_testp[:150], color='green')  # GREEN - actual RESULT
-            plt.plot(new_predicted[:150], color='red')  # ORANGE - restored PREDICTION
+        #for pred, par in zip(predicted, params):
+        #    a = pred * par[1]
+        #    a += par[0]
+        #    new_predicted.append(a)
 
-        except Exception as e:
-            print
-            str(e)
-    plt.show()
+        #mse = mean_squared_error(predicted, new_predicted)
+        #print(mse)
+
+        #try:
+        #    fig = plt.figure()
+        #    plt.plot(Y_test[:150], color='black')  # BLUE - trained RESULT
+        #    plt.plot(predicted[:150], color='blue')  # RED - trained PREDICTION
+        #    plt.plot(Y_testp[:150], color='green')  # GREEN - actual RESULT
+        #    plt.plot(new_predicted[:150], color='red')  # ORANGE - restored PREDICTION
+
+        #except Exception as e:
+        #    print
+        #    str(e)
+    #plt.show()
     model_number = model_number + 1
