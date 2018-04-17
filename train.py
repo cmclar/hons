@@ -112,6 +112,7 @@ while model_number < 3:
 
             model.compile(optimizer='adam', loss='mse')
 
+
             X_train = np.expand_dims(X_train, axis=2)
             Y_train = np.expand_dims(Y_train, axis=2)
             X_test = np.expand_dims(X_test, axis=2)
